@@ -45,7 +45,7 @@ namespace B1_1
             {
                 tasks[i] = MergeFiles(i, str);                
             }   
-            writeFileSemaphore.Release();
+            //writeFileSemaphore.Release();
             foreach(Task task in tasks)
             {
                 task.Start();
@@ -66,6 +66,7 @@ namespace B1_1
                 await writeFileSemaphore.WaitAsync().ConfigureAwait(false);
                 File.AppendAllLines("C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file.txt", line.ToArray());
                 writeFileSemaphore.Release();
+                line.Clear();
             });
             return task;
         }
