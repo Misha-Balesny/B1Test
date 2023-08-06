@@ -4,13 +4,13 @@ namespace B1_1
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             bool iscreated = false;
             while (true)
             {
                 Console.WriteLine("type \"g\" to generate files, \"m\" to merge files, \"i\" to import files, \"s\" to calculate sum and median");
-                Stopwatch sw = new Stopwatch();
+                Stopwatch sw = new();
                 switch (Console.ReadLine())
                 {
                     case "g":
@@ -22,20 +22,28 @@ namespace B1_1
                             TimeSpan ts = sw.Elapsed;
                             string elapsedTime = String.Format("{0:00}s {1:00}ms",ts.Seconds, ts.Milliseconds / 10);
                             Console.WriteLine("generated "+ elapsedTime);
+                            iscreated = true;
                             break;
                         }
                     case "m":
                         {
-                            Console.WriteLine("delete string:");
-                            string line = Console.ReadLine();
-                            Console.WriteLine("Merging...");
-                            sw.Start();
-                            FileHandler.Merge(line);
-                            Console.WriteLine("lines deleted: "+FileHandler.Count);
-                            sw.Stop();
-                            TimeSpan ts = sw.Elapsed;
-                            string elapsedTime = String.Format("{0:00}m {1:00}s {2:00}ms",ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-                            Console.WriteLine(elapsedTime);                                                           
+                            if (iscreated)
+                            {
+                                Console.WriteLine("delete string:");
+                                string line = Console.ReadLine();
+                                Console.WriteLine("Merging...");
+                                sw.Start();
+                                FileHandler.Merge(line);
+                                Console.WriteLine("lines deleted: "+FileHandler.Count);
+                                sw.Stop();
+                                TimeSpan ts = sw.Elapsed;
+                                string elapsedTime = String.Format("{0:00}m {1:00}s {2:00}ms", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                                Console.WriteLine(elapsedTime);
+                            }
+                            else
+                            {
+                                Console.WriteLine("generate files first");
+                            }
                             break;
                         }
                     case "i": 
