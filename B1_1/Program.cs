@@ -9,7 +9,7 @@ namespace B1_1
             bool iscreated = false;
             while (true)
             {
-                Console.WriteLine("type \"g\" to generate files, \"m\" to merge files, \"i\" to import files");
+                Console.WriteLine("type \"g\" to generate files, \"m\" to merge files, \"i\" to import files, \"s\" to calculate sum and median");
                 Stopwatch sw = new Stopwatch();
                 switch (Console.ReadLine())
                 {
@@ -25,7 +25,7 @@ namespace B1_1
                             break;
                         }
                     case "m":
-                        {                               
+                        {
                             Console.WriteLine("delete string:");
                             string line = Console.ReadLine();
                             Console.WriteLine("Merging...");
@@ -39,9 +39,22 @@ namespace B1_1
                             break;
                         }
                     case "i": 
-                        { 
-                            FileHandler.Import(); 
+                        {
+                            //"C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file.txt"
+                            Console.WriteLine("Enter file path:");
+                            string path = Console.ReadLine();
+                            sw.Start();
+                            FileHandler.Import(path);
+                            sw.Stop();
+                            TimeSpan ts = sw.Elapsed;
+                            string elapsedTime = String.Format("{0:00}m {1:00}s {2:00}ms", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                            Console.WriteLine(elapsedTime);
                             break; 
+                        }
+                    case "s":
+                        {
+                            Console.WriteLine(FileHandler.CallStored());
+                            break;
                         }
                     default: break;
                 }

@@ -1,15 +1,21 @@
-﻿using System.Text;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Text;
 
 namespace B1_1
 {
     internal class FileHandler
     {
-        private static readonly SemaphoreSlim writeFileSemaphore = new SemaphoreSlim(0, 1);
+        private static int filesCount = 100;
+        private static int linesCount = 100000;
         public static int Count = 0;
+        private static readonly string selectNumbersSum = "SELECT SUM(CAST(num1 AS decimal)) FROM [B1_1].[dbo].[Lines]";
+        private static readonly string selectNumbersMed = "SELECT TOP(1) Percentile_Disc(0.5) WITHIN GROUP(ORDER BY num2) OVER() FROM[B1_1].[dbo].[Lines]";
         internal static void Generate()
         {
-            Task[] tasks = new Task[100];
-            for (int i = 0; i < 100; i++)
+            Task[] tasks = new Task[filesCount];
+            for (int i = 0; i < filesCount; i++)
             {                
                 tasks[i] = GenerateFile(i);
             }
@@ -23,8 +29,8 @@ namespace B1_1
         {
             Task task = new Task(() =>
             {
-                FileStream fs = new FileStream(string.Format("C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file{0}.txt", c.ToString()), FileMode.Create);
-                for (int i = 0; i < 100000; i++)
+                FileStream fs = new FileStream(string.Format("file{0}.txt", c.ToString()), FileMode.Create);
+                for (int i = 0; i < linesCount; i++)
                 {
                     var text = new DataModel();
                     fs.Write(Encoding.Default.GetBytes(text.ToString()));
@@ -33,47 +39,118 @@ namespace B1_1
             });           
             return task;
         }
-        internal static void Merge(string str)
+        internal static void MergeAsync(string str)
         {
+            FileStream fs = new FileStream("file.txt", FileMode.Create);
+
             if (str == null)
             {
                 str = string.Empty;
             }
             Count = 0;
-            Task[] tasks = new Task[100];
-            for (int i = 0; i < 100; i++)
+            Task[] tasks = new Task[filesCount];
+            for (int i = 0; i < filesCount; i++)
             {
-                tasks[i] = MergeFiles(i, str);                
+                tasks[i] = MergeFileTask(i, str, fs);                
             }   
-            //writeFileSemaphore.Release();
+            
             foreach(Task task in tasks)
             {
                 task.Start();
             }
             Task.WaitAll(tasks);
-        }
-        private static Task MergeFiles(int c, string str)
-        {
-            FileStream fs = new FileStream("C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file.txt", FileMode.Create);
             fs.Close();
-            Task task = new Task(async () =>
+            Console.WriteLine("merged");
+        }
+
+        private static Task MergeFileTask(int c, string str, FileStream fs)
+        {            
+            Task task = new Task( () =>
             {
-                string filePath = string.Format("C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file{0}.txt", c.ToString());
+                string filePath = string.Format("file{0}.txt", c.ToString());
                 List<string> line = File.ReadAllLines(filePath).ToList();
                 line.RemoveAll(s => s.IndexOf(str) > 0);
-                Count += 100000 - line.Count();
-
-                await writeFileSemaphore.WaitAsync().ConfigureAwait(false);
-                File.AppendAllLines("C:\\Users\\миша\\source\\repos\\B1\\B1_1\\Files\\file.txt", line.ToArray());
-                writeFileSemaphore.Release();
-                line.Clear();
+                Count += linesCount - line.Count();
+                Task.Delay(10);
+                fs.Write(Encoding.Default.GetBytes(string.Join("\n", line) + "\n"));                
             });
             return task;
         }
-        internal static void Import()
+
+        internal static void Merge(string str)
         {
+            FileStream fs = new FileStream("file.txt", FileMode.Create);
 
+            if (str == null)
+            {
+                str = string.Empty;
+            }
+            Count = 0;
+            for (int i = 0; i < filesCount; i++)
+            {
+                string filePath = string.Format("file{0}.txt", i.ToString());
+                List<string> line = File.ReadAllLines(filePath).ToList();
+                line.RemoveAll(s => s.IndexOf(str) > 0);
+                Count += linesCount - line.Count();
+                Task.Delay(10);
+                fs.Write(Encoding.Default.GetBytes(string.Join("\n", line) + "\n"));
+            }
+            fs.Close();
+            Console.WriteLine("merged");
+        }
 
+        internal static void Import(string path)
+        {            
+            using AppContext context = new();
+            int i = 1;
+            try
+            {
+                List<string> lines = File.ReadAllLines(path).ToList();
+                foreach (var item in lines)
+                {                   
+                    context.Add(new DataModel(item));
+                    Console.WriteLine($"{i++} / {lines.Count}");
+                    context.SaveChanges();
+                }
+                Console.WriteLine("Imported");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"!exeption! {e}");
+            }            
+        }
+
+        internal static string CallStored()
+        {            
+            return $"sum = {CalculateNumbersSum()} median = {CalculateDoubleNumbersMedian()}";
+        }
+
+        public static decimal CalculateNumbersSum()
+        {
+            decimal res = 0;
+            AppContext db = new AppContext();
+            using (var connection = new SqlConnection(db.ConnectionString))
+            {
+                connection.Open();
+                var selectSumCommand = new SqlCommand(selectNumbersSum, connection);
+                var prob_res = selectSumCommand.ExecuteScalar();
+                res = Convert.ToDecimal(prob_res);
+            }
+            return res;
+        }
+
+        public static double CalculateDoubleNumbersMedian()
+        {
+            double res = 0.0;
+            AppContext db = new AppContext();
+            using (var connection = new SqlConnection(db.ConnectionString))
+            {
+                connection.Open();
+                var selectSumCommand = new SqlCommand(selectNumbersMed, connection);
+                var prob_res = selectSumCommand.ExecuteScalar();
+                res = Convert.ToDouble(prob_res);
+            }
+            return res;
         }
     }
 }
