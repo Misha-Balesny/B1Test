@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 
 namespace B1_2
 {
-    internal class ViewModel
+    internal class ViewModel: INotifyPropertyChanged
     {
         private ReportInfo selectedReport;
         private int selectedReportId;
@@ -64,34 +64,11 @@ namespace B1_2
                     SelectedStartPeriod = selectedReport.StartPeriod;
                     OnPropertyChanged("SelectedStartPeriod");
                     SelectedEndPeriod = selectedReport.EndPeriod;
-                    //OnPropertyChanged("SelectedEndPeriod");
+                    OnPropertyChanged("SelectedEndPeriod");
                     SelectedReportDate = selectedReport.ReportDate;
-                    //OnPropertyChanged("SelectedReportDate");
+                    OnPropertyChanged("SelectedReportDate");
                     SelectedTitle = selectedReport.Title;
-                    //OnPropertyChanged("SelectedTitle");
-                }
-            }
-        }
-        public int SelectedReportId
-        {
-            get { return selectedReportId; }
-            set
-            {
-                selectedReportId = value;
-                OnPropertyChanged("SelectedReportId");
-                if (selectedReportId != null)
-                {
-                    Rows.Clear();
-                    var rows = ExcelHandler.GetRowsFromDb(Reports[selectedReportId].Id, context);
-                    foreach (var item in rows)
-                    {
-                        Rows.Add(item);
-                    }
-                    SelectedBankName = selectedReport.BankName;
-                    SelectedStartPeriod = selectedReport.StartPeriod;
-                    SelectedEndPeriod = selectedReport.EndPeriod;
-                    SelectedReportDate = selectedReport.ReportDate;
-                    SelectedTitle = selectedReport.Title;
+                    OnPropertyChanged("SelectedTitle");
                 }
             }
         }
