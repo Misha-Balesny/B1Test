@@ -81,12 +81,6 @@ namespace B1_2
                 Reports.Add(new ReportInfo(item));
             }    
             Rows = new ObservableCollection<Row>();
-            selectedReportId = 0;
-            selectedReport = ExcelHandler.GetReportInfo(Reports[0].Id, context);
-            /*foreach (var item in ExcelHandler.GetRowsFromDb(1, context))
-            {
-                Rows.Add(item);
-            }*/
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
