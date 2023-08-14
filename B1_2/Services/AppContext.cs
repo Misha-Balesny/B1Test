@@ -14,7 +14,6 @@ namespace B1_2.Services
 
         internal AppContext()
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
