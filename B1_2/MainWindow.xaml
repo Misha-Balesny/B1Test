@@ -5,8 +5,68 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:B1_2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="700" Width="1000">
+
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="200" Width="400"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <ListView Grid.Row="1" 
+                      Name="ReportList"
+                      ItemsSource="{Binding Reports}" SelectedItem="{Binding SelectedReport}"
+                      >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=BankName}" Width="auto">Имя</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=ReportDate}" Width="auto">Дата</GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="{Binding SelectedBankName}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="{Binding SelectedStartPeriod}"/>
+                <Label Grid.Row="2" Grid.Column="0" Content="{Binding SelectedEndPeriod}"/>
+                <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedTitle}"/>
+                <Label Grid.Row="1" Grid.Column="1" Content="{Binding SelectedReportDate}"/>
+                <Button Grid.Row="3" Grid.Column="0" Width="100" Command="{Binding OpenFileCommand}" Content="Открыть"/>
+            </Grid>
+            <ListView MaxHeight="650" Grid.Row="1" ItemsSource="{Binding Rows}"
+                      VerticalContentAlignment="Top"  
+          ScrollViewer.VerticalScrollBarVisibility="Visible"
+          ScrollViewer.CanContentScroll="True">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Number}" Width="auto">Б/сч</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=InBalanceActive}" Width="auto">Вход. Сальдо Актив</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=InBalancePassive}" Width="auto">Вход. Сальдо Пассив</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=TurnoverDebit}" Width="auto">Дебет</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=TurnoverCredit}" Width="auto">Кредит</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=OutBalanceActive}" Width="auto">Исход. Сальдо Актив</GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=OutBalancePassive}" Width="auto">Исход. Сальдо Пассив</GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
     </Grid>
 </Window>
